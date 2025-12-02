@@ -1,164 +1,165 @@
-# Cisco-ACI-Lab
-Lab – Déploiement du Cisco ACI Simulator sur VMware Workstation &amp; Intégration des premiers nœuds
-Voici une **version totalement restructurée en format LAB**, prête à être publiée sur GitHub dans un dépôt *Cisco-ACI-Lab* ou *ACI-Simulator-Lab*.
-Le style suit les standards GitHub Labs : sections, étapes, prérequis, screenshots (que tu ajouteras), résultats et concepts clés.
 
-# 🧪 **Lab – Déploiement du Cisco ACI Simulator sur VMware Workstation & Intégration des premiers nœuds**
+# Cisco-ACI-Lab
+# 🧪 **Lab – Deployment of the Cisco ACI Simulator on VMware Workstation & Integration of the First Nodes**
 
 ## 📘 **Overview**
 
-Dans ce lab, je décris les étapes réalisées pour **déployer le Cisco ACI Simulator** sur **VMware Workstation**, initialiser l’APIC et intégrer les premiers **nœuds Leaf** dans le fabric ACI.
+In this lab, I describe the steps taken to **deploy the Cisco ACI Simulator** on **VMware Workstation**, initialize the APIC, and integrate the first **Leaf nodes** into the ACI fabric.
 
-Ce projet m’a permis de renforcer ma compréhension de **Cisco ACI (Application Centric Infrastructure)**, une architecture SDN moderne utilisée dans les environnements Datacenter.
+This project helped me strengthen my understanding of **Cisco ACI (Application Centric Infrastructure)**, a modern SDN architecture used in datacenter environments.
 
 ---
 
-# 🔵 **1. Introduction à Cisco ACI**
+# 🔵 **1. Introduction to Cisco ACI**
 
-Cisco ACI est une architecture datacenter basée sur le **Software-Defined Networking (SDN)**, permettant :
+Cisco ACI is a datacenter architecture based on **Software-Defined Networking (SDN)**, enabling:
 
-* l’**automatisation** des configurations,
-* la **centralisation** du contrôle réseau,
-* la **programmabilité** du fabric.
+* **automation** of configurations,
+* **centralization** of network control,
+* **programmability** of the fabric.
 
-### 🔧 Comparaison avec d’autres solutions SDN
+### 🔧 Comparison with other SDN solutions
 
-| Domaine                 | Technologie      |
+| Domain                  | Technology       |
 | ----------------------- | ---------------- |
 | WAN                     | **Cisco SD-WAN** |
 | LAN                     | **Cisco DNA**    |
 | Datacenter              | **Cisco ACI**    |
-| Virtualisation (VMware) | **VMware NSX**   |
+| Virtualization (VMware) | **VMware NSX**   |
 | Arista                  | **CloudVision**  |
 
-### 🧩 Composants principaux d’un fabric ACI
+### 🧩 Main Components of an ACI Fabric
 
-* **APIC (Application Policy Infrastructure Controller)** → le cerveau
-* **Spines** → cœur du réseau, gèrent control plane & data plane
-* **Leafs** → switches connectant serveurs, firewalls, endpoints
-* **Fabric** → ensemble automatisé grâce au Zero Touch Provisioning (ZTP)
+* **APIC (Application Policy Infrastructure Controller)** → the brain
+* **Spines** → the core of the network, managing the control plane & data plane
+* **Leafs** → switches connecting servers, firewalls, and endpoints
+* **Fabric** → automated system thanks to Zero Touch Provisioning (ZTP)
 
-L’APIC orchestre tout :
-découverte des nœuds, gestion des politiques, cohérence du fabric et supervision.
-
----
-
-# 🔵 **2. Objectifs du Lab**
-
-1. Déployer le Cisco ACI Simulator (OVA) sur VMware Workstation
-2. Initialiser et configurer le premier APIC
-3. Ajouter un premier switch Leaf dans le fabric
-4. Comprendre le processus de découverte LLDP et l’enrôlement dans le fabric
+The APIC orchestrates everything:
+node discovery, policy management, fabric consistency, and global supervision.
 
 ---
 
-# 🔵 **3. Environnement & Prérequis**
+# 🔵 **2. Lab Objectives**
 
-### 🖥️ **Matériel utilisé**
+✔️ Deploy the Cisco ACI Simulator (OVA) on VMware Workstation
+✔️ Initialize and configure the first APIC
+✔️ Add a first Leaf switch to the fabric
+✔️ Understand the LLDP discovery process and node enrollment
+
+---
+
+# 🔵 **3. Environment & Prerequisites**
+
+### 🖥️ **Hardware Used**
 
 * VMware Workstation
-* 8 vCPU
-* 32 Go de RAM
-* Stockage suffisant pour l’OVA ACI (~70 Go)
+* 8 vCPUs
+* 32 GB RAM
+* Sufficient storage for the ACI OVA (~70 GB)
 
-### ⚙️ **Ressources allouées**
+### ⚙️ **Allocated Resources**
 
-Le laboratoire recommande plus, mais j’ai adapté :
+The recommended specs are higher, but I adapted them:
 
-| Composant | Ressources Recommandées | Ressources Affectées  |
-| --------- | ----------------------- | --------------------- |
-| APIC      | 8 CPU / 24–32 Go RAM    | **4 CPU / 16 Go RAM** |
-| Leafs     | 4 CPU / 8 Go RAM        | Conforme              |
+| Component | Recommended Resources | Allocated Resources   |
+| --------- | --------------------- | --------------------- |
+| APIC      | 8 CPU / 24–32 GB RAM  | **4 CPU / 16 GB RAM** |
+| Leafs     | 4 CPU / 8 GB RAM      | Standard              |
 
-### 📥 **Fichier utilisé**
+### 📥 **File Used**
 
-* **Cisco ACI Simulator OVA** (fourni par Cisco DevNet)
-
----
-
-# 🔵 **4. Étapes du Lab**
+* **Cisco ACI Simulator OVA** (provided by Cisco DevNet)
 
 ---
 
-## **Étape 1 – Déploiement de l’OVA ACI Simulator**
+# 🔵 **4. Lab Steps**
 
-1. Importation de l’OVA dans VMware Workstation
-2. Modification des ressources CPU / RAM
-3. Résolution d'un message bloquant lié à un nombre insuffisant de CPU
-4. Démarrage & initialisation complète de la VM APIC
-5. Configuration initiale :
+---
 
-   * Adresse IP
+## **Step 1 – Deploying the ACI Simulator OVA**
+
+1. Import the OVA into VMware Workstation
+2. Adjust CPU / RAM resources
+3. Resolve a blocking message related to insufficient CPU
+4. Start and fully initialize the APIC VM
+5. Perform the initial setup:
+
+   * IP Address
    * Gateway
-   * Credentials des APICs
+   * APIC credentials
    * Fabric Name
 
-📌 *Malgré les ressources limitées, l’APIC a pu s’initialiser correctement.*
+📌 *Despite the limited resources, the APIC successfully completed initialization.*
 
 ---
 
-## **Étape 2 – Mise en place du fabric ACI**
+## **Step 2 – Setting Up the ACI Fabric**
 
-### 🔍 2.1 Découverte automatique des nœuds (LLDP)
+### 🔍 2.1 Automatic Node Discovery (LLDP)
 
-Lorsque le simulateur ACI démarre :
+When the ACI Simulator starts:
 
-* les Leafs se présentent via **LLDP**,
-* l’APIC les détecte automatiquement,
-* le fabric propose l’intégration avec un ID unique.
+* Leaf switches announce themselves using **LLDP**,
+* The APIC automatically detects them,
+* The fabric offers enrollment with a unique node ID.
 
-### 🧩 2.2 Ajout du premier Leaf
+### 🧩 2.2 Adding the First Leaf Switch
 
-J’ai intégré le premier switch en spécifiant :
+I integrated the first switch by specifying:
 
-* le **Node ID**,
-* le **Node Name**,
-* le **Role** (Leaf / Spine),
-* la **Pod Assignment**.
+* **Node ID**
+* **Node Name**
+* **Role** (Leaf / Spine)
+* **Pod Assignment**
 
-Cela m’a permis de visualiser :
+This allowed me to visualize:
 
-* le processus de découverte
-* la création de la topologie
-* l’arrivée du nœud en état *"In Discovery"* puis *"Registered"*
-* la cohérence du fabric contrôlée par APIC
+* the discovery process
+* topology creation
+* the node transitioning from *"In Discovery"* to *"Registered"*
+* fabric consistency controlled by the APIC
 
-# 🔵 **5. Résultats & Compréhensions Acquises**
+---
 
-Ce lab m’a permis de mieux comprendre :
+# 🔵 **5. Results & Lessons Learned**
 
-### ✔ **L’architecture interne du fabric ACI**
+This lab helped me better understand:
 
-Spines et Leafs communiquent via un underlay automatisé.
+### ✔ **The internal architecture of the ACI fabric**
 
-### ✔ **Le rôle central du contrôleur APIC**
+Spines and Leafs communicate through an automated underlay.
 
-Interface unique pour la politique, la découverte, la gestion du fabric.
+### ✔ **The central role of the APIC controller**
 
-### ✔ **Le processus de Zero Touch Provisioning (ZTP)**
+A single interface for policies, discovery, and fabric-wide management.
 
-Les nœuds se configurent eux-mêmes dès leur connexion au fabric.
+### ✔ **The Zero Touch Provisioning (ZTP) process**
 
-### ✔ **L’automatisation du datacenter via ACI**
+Nodes configure themselves automatically as soon as they join the fabric.
 
-ACI simplifie les opérations réseau en réduisant la configuration manuelle.
+### ✔ **Datacenter automation with ACI**
 
+ACI simplifies network operations by reducing manual configuration.
 
-# 🔵 **6. Points que j’ajouterai plus tard dans le Lab (Roadmap)**
+---
 
-* Déploiement des **EPGs**, **Bridge Domains**, **VRFs**
-* Configuration de contrats (ACI Contracts)
-* Intégration d’un hyperviseur (VMware ESXi)
-* Automatisation via API REST & Python
-* Ajout de Spines dans le fabric
+# 🔵 **6. Features I Will Add Later (Roadmap)**
+
+* Deployment of **EPGs**, **Bridge Domains**, **VRFs**
+* Configuration of ACI Contracts
+* Integration of a hypervisor (VMware ESXi)
+* Automation using REST API & Python
+* Adding Spine switches to the fabric
+
+---
 
 # 🎯 **Conclusion**
 
-Ce lab m’a offert une première immersion complète dans Cisco ACI, depuis l’installation jusqu’à l’intégration d’un premier switch Leaf.
-Il m’a permis de consolider mes bases sur :
+This lab gave me a complete first immersion into Cisco ACI, from installation to the integration of the first Leaf switch.
+It helped me reinforce my understanding of:
 
-* la logique du fabric,
-* la découverte automatique,
-* l’importance de l’APIC,
-* et l'automatisation au cœur de l’architecture ACI.
-
+* the logic of the fabric
+* automatic discovery
+* the importance of the APIC
+* and automation at the heart of ACI architecture
